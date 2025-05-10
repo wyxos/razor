@@ -15,8 +15,13 @@ if ! id "razor" &>/dev/null; then
   adduser --disabled-password --gecos "" razor
 fi
 
+# Set up app directory
+APP_DIR="/home/razor/razor"
+mkdir -p "$APP_DIR"
+chown razor:razor "$APP_DIR"
+
 # Set up database
-echo "💾 Creating database..."
+echo "📂 Creating database..."
 DB_NAME="razor"
 DB_USER="razor"
 DB_PASS="razorpass"
@@ -28,8 +33,7 @@ mysql -e "FLUSH PRIVILEGES;"
 
 # Clone Razor panel
 echo "📦 Cloning Razor..."
-APP_DIR="/home/razor/razor"
-git clone https://github.com/YOUR_USERNAME/razor "$APP_DIR"
+sudo -u razor git clone https://github.com/YOUR_USERNAME/razor "$APP_DIR" || { echo "Clone failed, aborting."; exit 1; }
 
 cd "$APP_DIR"
 
@@ -70,7 +74,7 @@ server {
 }
 EOF
 
-ln -s /etc/nginx/sites-available/razor /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/razor /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 systemctl restart nginx
 
