@@ -10,6 +10,11 @@ apt update && apt upgrade -y
 # Install base dependencies
 apt install -y git unzip curl php-cli php-mbstring php-xml php-bcmath php-curl php-mysql php-zip php-fpm php-gd php-soap php-tokenizer nginx mysql-server supervisor ufw
 
+# Create razor user if not exists
+if ! id "razor" &>/dev/null; then
+  adduser --disabled-password --gecos "" razor
+fi
+
 # Set up database
 echo "💾 Creating database..."
 DB_NAME="razor"
@@ -23,9 +28,10 @@ mysql -e "FLUSH PRIVILEGES;"
 
 # Clone Razor panel
 echo "📦 Cloning Razor..."
-git clone https://github.com/YOUR_USERNAME/razor /var/www/razor
+APP_DIR="/home/razor/razor"
+git clone https://github.com/YOUR_USERNAME/razor "$APP_DIR"
 
-cd /var/www/razor
+cd "$APP_DIR"
 
 # Set permissions
 chown -R www-data:www-data .
@@ -34,7 +40,7 @@ chown -R www-data:www-data .
 curl -sS https://getcomposer.org/installer | php
 php composer.phar install --no-dev --optimize-autoloader
 
-# .env setup (basic stub)
+# .env setup
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --force
@@ -45,8 +51,8 @@ cat >/etc/nginx/sites-available/razor <<EOF
 server {
     listen 80;
     server_name _;
-    root /var/www/razor/public;
 
+    root /home/razor/razor/public;
     index index.php index.html;
 
     location / {
@@ -65,7 +71,7 @@ server {
 EOF
 
 ln -s /etc/nginx/sites-available/razor /etc/nginx/sites-enabled/
-rm /etc/nginx/sites-enabled/default
+rm -f /etc/nginx/sites-enabled/default
 systemctl restart nginx
 
 # Firewall (optional)
