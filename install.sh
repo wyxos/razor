@@ -8,7 +8,7 @@ echo "🛠  Installing Razor Server Panel..."
 apt update && apt upgrade -y
 
 # Install base dependencies
-apt install -y git unzip curl php-cli php-mbstring php-xml php-bcmath php-curl php-mysql php-zip php-fpm php-gd php-soap php-tokenizer nginx mysql-server supervisor ufw
+apt install -y git unzip curl php-cli php-mbstring php-xml php-bcmath php-curl php-mysql php-zip php-fpm php-gd php-soap php-tokenizer nginx mariadb-server supervisor ufw
 
 # Create razor user if not exists
 if ! id "razor" &>/dev/null; then
@@ -26,10 +26,10 @@ DB_NAME="razor"
 DB_USER="razor"
 DB_PASS="razorpass"
 
-mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
-mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
-mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
-mysql -e "FLUSH PRIVILEGES;"
+mariadb -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+mariadb -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';"
+mariadb -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
+mariadb -e "FLUSH PRIVILEGES;"
 
 # Clone Razor panel
 echo "📦 Cloning Razor..."
