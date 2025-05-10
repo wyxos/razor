@@ -33,7 +33,7 @@ mariadb -e "FLUSH PRIVILEGES;"
 
 # Clone Razor panel
 echo "📦 Cloning Razor..."
-sudo -u razor git clone https://github.com/YOUR_USERNAME/razor "$APP_DIR" || { echo "Clone failed, aborting."; exit 1; }
+sudo -u razor git clone git@github.com:wyxos/razor.git "$APP_DIR" || { echo "Clone failed, aborting."; exit 1; }
 
 cd "$APP_DIR"
 
