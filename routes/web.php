@@ -35,7 +35,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'ip',
                 Rule::unique('servers')
             ],
-            'external' => 'boolean',
+            'external' => [
+                'boolean',
+                function ($attribute, $value, $fail) {
+                    if (!$value && Server::where('external', false)->exists()) {
+                        $fail('Only one non-external server is allowed.');
+                    }
+                },
+            ],
         ]);
 
         // Create the server
@@ -53,6 +60,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         $server->delete();
         return redirect()->route('servers.index');
     })->name('servers.destroy');
+
+    Route::patch('servers/{server}', function (Server $server) {
+        request()->validate([
+            'label' => 'required|string|max:255'
+        ]);
+
+        $server->update([
+            'label' => request('label')
+        ]);
+
+        return redirect()->route('servers.show', $server->id);
+    })->name('servers.update.label');
 
     // show
     Route::get('servers/{server}', function (Server $server) {

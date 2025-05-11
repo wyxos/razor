@@ -5,6 +5,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import PlaceholderPattern from '../../components/PlaceholderPattern.vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -18,12 +19,21 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const props = defineProps({
-    server: Object,
-});
+interface Server {
+    id: number;
+    label: string;
+    ip: string | null;
+    external: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
+const props = defineProps<{
+    server: Server;
+}>();
 
 const form = useForm({
-    label: props.server.label,
+    label: props.server.label ?? '',
 });
 
 const editMode = ref(false);
@@ -60,7 +70,7 @@ const deleteServer = () => {
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <div class="text-sm text-gray-500">IP Address</div>
-                    <div>{{ server.ip || 'N/A' }}</div>
+                    <div>{{ server?.ip || 'N/A' }}</div>
                 </div>
                 <div>
                     <div class="text-sm text-gray-500">Type</div>
