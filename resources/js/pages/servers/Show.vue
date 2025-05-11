@@ -53,7 +53,7 @@ const deleteServer = () => {
     <Head :title="server.label" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="space-y-6 p-4">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center justify-between">
                 <div v-if="!editMode" class="flex items-center space-x-4">
                     <h2 class="text-2xl font-bold">{{ server.label }}</h2>

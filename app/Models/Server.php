@@ -11,4 +11,9 @@ class Server extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    public function applications(): \Illuminate\Database\Eloquent\Relations\HasMany|Server
+    {
+        return $this->hasMany(Application::class);
+    }
 }

@@ -19,11 +19,6 @@ const mainNavItems: NavItem[] = [
         href: '/servers',
         icon: LayoutGrid,
     },
-    {
-        title: 'Applications',
-        href: '/applications',
-        icon: LayoutGrid,
-    },
 ];
 
 const footerNavItems: NavItem[] = [

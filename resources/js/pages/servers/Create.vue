@@ -32,7 +32,7 @@ const submit = () => {
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="p-4">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <form @submit.prevent="submit" class="space-y-4">
                 <div class="grid gap-2">
                     <Label for="label">Label</Label>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import PlaceholderPattern from '../../components/PlaceholderPattern.vue';
+import { Button } from '@/components/ui/button';
+import { OTable, OTableColumn } from '@oruga-ui/oruga-next';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -10,6 +12,17 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
 ];
+
+defineProps({
+    server: {
+        type: Object,
+        required: true,
+    },
+    applications: {
+        type: Object,
+        required: true,
+    },
+});
 </script>
 
 <template>
@@ -17,20 +30,23 @@ const breadcrumbs: BreadcrumbItem[] = [
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min">
-                <PlaceholderPattern />
-            </div>
+            <Button @click="router.visit('/applications/create')">Create Application</Button>
+
+            <OTable :data="applications.data" pagination :per-page="applications.per_page" :total="applications.total">
+                <OTableColumn v-slot="{ row }">
+                    {{ row.id }}
+                </OTableColumn>
+                <OTableColumn v-slot="{ row }">
+                    {{ row.name }}
+                </OTableColumn>
+                <OTableColumn v-slot="{ row }">
+                    <Button @click="router.visit(route('applications.show', row.id))">Edit</Button>
+                </OTableColumn>
+
+                <template #empty>
+                    <p>No applications found.</p>
+                </template>
+            </OTable>
         </div>
     </AppLayout>
 </template>

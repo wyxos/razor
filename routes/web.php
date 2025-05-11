@@ -80,8 +80,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ]);
     })->name('servers.show');
 
-    Route::get('applications', function () {
-        return Inertia::render('applications/Index');
+    Route::get('servers/{server}/applications', function () {
+        return Inertia::render('applications/Index')
+            ->with([
+                'applications' => Server::find(request('server'))->applications()->orderBy('name')->paginate(10)
+            ]);
     })->name('applications.index');
 });
 

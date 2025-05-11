@@ -26,7 +26,7 @@ defineProps({
     <Head title="Dashboard" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="p-4">
+        <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <Button @click="router.visit('/servers/create')">Create Server</Button>
 
             <OTable :data="servers.data" pagination :per-page="servers.per_page" :total="servers.total">
@@ -42,6 +42,10 @@ defineProps({
                 <OTableColumn v-slot="{row}">
                     <Button @click="router.visit(route('servers.show', row.id))">Edit</Button>
                 </OTableColumn>
+
+                <template #empty>
+                    <p>No servers found.</p>
+                </template>
             </OTable>
         </div>
     </AppLayout>
