@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->unique();
+            $table->string('domain')->unique();
+            $table->foreignId('server_id')->constrained('servers')->onDelete('cascade');
+            $table->string('repository');
+            $table->string('branch');
+            $table->string('path');
+            $table->string('public_path');
             $table->timestamps();
         });
     }

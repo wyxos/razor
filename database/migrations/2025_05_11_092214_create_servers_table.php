@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('servers', function (Blueprint $table) {
             $table->id();
+            $table->string('label')->unique();
+            $table->string('ip')->unique();
             $table->timestamps();
         });
     }
