@@ -1,7 +1,5 @@
 <?php
 
-namespace Tests\Http\Controllers;
-
 use App\Models\Server;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

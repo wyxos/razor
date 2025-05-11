@@ -17,7 +17,13 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->unique()->word(),
+            'domain' => $this->faker->unique()->domainName(),
+            'server_id' => \App\Models\Server::factory(),
+            'repository' => $this->faker->url(),
+            'branch' => $this->faker->word(),
+            'path' => $this->faker->word(),
+            'public_path' => $this->faker->word(),
         ];
     }
 }

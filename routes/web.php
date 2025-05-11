@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\ServerController;
 use App\Models\Server;
 use Illuminate\Support\Facades\Route;
@@ -21,7 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('servers/{server}', [ServerController::class, 'destroy'])->name('servers.destroy');
     Route::patch('servers/{server}', [ServerController::class, 'update'])->name('servers.update.label');
     Route::get('servers/{server}', [ServerController::class, 'show'])->name('servers.show');
-    Route::get('servers/{server}/applications', [\App\Http\Controllers\ApplicationController::class, 'index'])->name('applications.index');
+    Route::get('servers/{server}/applications', [ApplicationController::class, 'index'])->name('applications.index');
 });
 
 require __DIR__.'/settings.php';
