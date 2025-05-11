@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /var/www/razor || exit 1
+cd /home/razor/razor || exit 1
 git pull origin main
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force

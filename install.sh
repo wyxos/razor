@@ -4,18 +4,32 @@ set -e
 
 echo "🛠  Installing Razor Server Panel..."
 
-# Ensure the system is up to date
+# Update and base packages
 apt update && apt upgrade -y
+apt install -y git unzip curl software-properties-common nginx supervisor ufw
 
-# Install base dependencies (MariaDB excluded)
-apt install -y git unzip curl php-cli php-mbstring php-xml php-bcmath php-curl php-zip php-fpm php-gd php-soap php-tokenizer php-sqlite3 nginx supervisor ufw
+# Add ondrej/php PPA
+add-apt-repository ppa:ondrej/php -y
+apt update
+
+# Install PHP versions 8.0–8.4
+PHP_VERSIONS=("8.0" "8.1" "8.2" "8.3" "8.4")
+for ver in "${PHP_VERSIONS[@]}"; do
+  apt install -y php$ver-cli php$ver-fpm php$ver-mbstring php$ver-xml php$ver-bcmath php$ver-curl php$ver-zip php$ver-gd php$ver-soap php$ver-tokenizer php$ver-sqlite3
+
+  mkdir -p /opt/php/$ver/bin
+  cp -L /usr/bin/php$ver /opt/php/$ver/bin/php
+  ln -sf /opt/php/$ver/bin/php /usr/bin/php${ver//./}
+
+  curl -sS https://getcomposer.org/installer | /opt/php/$ver/bin/php -- --install-dir=/opt/php/$ver/bin --filename=composer
+  ln -sf /opt/php/$ver/bin/composer /usr/bin/composer${ver//./}
+done
 
 # Create razor user if not exists
 if ! id "razor" &>/dev/null; then
   adduser --disabled-password --gecos "" razor
 fi
 
-# Set up app directory
 APP_DIR="/home/razor/razor"
 if [ -d "$APP_DIR" ] && [ "$(ls -A $APP_DIR)" ]; then
   read -p "⚠️  $APP_DIR already exists and is not empty. Overwrite? (y/N): " confirm
@@ -29,50 +43,39 @@ fi
 mkdir -p "$APP_DIR"
 chown razor:razor "$APP_DIR"
 
-# Clone Razor panel
 echo "📦 Cloning Razor..."
 git clone https://github.com/wyxos/razor.git "$APP_DIR" || { echo "Clone failed, aborting."; exit 1; }
 
 cd "$APP_DIR"
 
-# Set permissions
 chown -R www-data:www-data .
 chmod o+rx /home/razor
-chmod -R o+rw /home/razor/razor/storage /home/razor/razor/bootstrap/cache
+chmod -R o+rw storage bootstrap/cache
 
-# Install PHP dependencies
-curl -sS https://getcomposer.org/installer | php
-php composer.phar install --no-dev --optimize-autoloader
-
-# .env setup
 cp .env.example .env
 sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
 sed -i 's|^DB_DATABASE=.*|DB_DATABASE=/home/razor/razor/database/database.sqlite|' .env
 
-# Ensure SQLite file exists
-touch /home/razor/razor/database/database.sqlite
-chown www-data:www-data /home/razor/razor/database/database.sqlite
-chmod 664 /home/razor/razor/database/database.sqlite
-chmod o+rx /home/razor/razor/database
+touch database/database.sqlite
+chown www-data:www-data database/database.sqlite
+chmod 664 database/database.sqlite
+chmod o+rx database
 
-php artisan key:generate
-php artisan migrate --force
+php84 /usr/bin/composer84 install --no-dev --optimize-autoloader
+php84 artisan key:generate
+php84 artisan migrate --force
 
 # Install Node.js via NVM and build frontend
 export NVM_DIR="/home/razor/.nvm"
 mkdir -p "$NVM_DIR"
-
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-
-export NVM_DIR="/home/razor/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 nvm install --lts
 
-cd /home/razor/razor
 npm ci || npm install
 npm run build
 
-# NGINX config
+# Configure NGINX
 echo "🌐 Configuring NGINX..."
 cat >/etc/nginx/sites-available/razor <<EOF
 server {
@@ -88,7 +91,7 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
     }
 
     location ~ /\.ht {
@@ -101,7 +104,7 @@ ln -sf /etc/nginx/sites-available/razor /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 systemctl restart nginx
 
-# Firewall (optional)
+# Enable firewall
 ufw allow OpenSSH
 ufw allow "Nginx Full"
 ufw --force enable
