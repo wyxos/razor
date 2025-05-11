@@ -5,6 +5,9 @@ import { Head, useForm } from '@inertiajs/vue3';
 import PlaceholderPattern from '../../components/PlaceholderPattern.vue';
 import { router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import InputError from '@/components/InputError.vue';
 import { ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -17,6 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 const form = useForm({
     label: '',
     ip: '',
+    external: true,
 });
 
 const submit = () => {
@@ -30,24 +34,27 @@ const submit = () => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-4">
             <form @submit.prevent="submit" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Label</label>
-                    <input
-                        type="text"
-                        v-model="form.label"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        required
-                    />
+                <div class="grid gap-2">
+                    <Label for="label">Label</Label>
+                    <Input id="label" type="text" v-model="form.label" class="mt-1 block w-full" required />
+                    <InputError :message="form.errors.label" />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">IP Address</label>
-                    <input
-                        type="text"
-                        v-model="form.ip"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        required
-                    />
+                    <label class="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            v-model="form.external"
+                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        />
+                        <span class="text-sm font-medium text-gray-700">External server</span>
+                    </label>
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="ip">IP Address</Label>
+                    <Input id="ip" type="text" v-model="form.ip" class="mt-1 block w-full" :disabled="form.external" required />
+                    <InputError :message="form.errors.ip" />
                 </div>
 
                 <Button type="submit">Create Server</Button>

@@ -24,6 +24,8 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.0.0",
+        "@oruga-ui/oruga-next": "^0.10.5",
+        "@oruga-ui/theme-oruga": "^0.6.0",
         "@tailwindcss/vite": "^4.1.1",
         "@vitejs/plugin-vue": "^5.2.1",
         "@vueuse/core": "^12.8.2",

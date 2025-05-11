@@ -2,6 +2,7 @@
 
 use App\Models\Server;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -14,7 +15,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::get('servers', function () {
-        return Inertia::render('servers/Index');
+        return Inertia::render('servers/Index')
+            ->with([
+                'servers' => Server::orderBy('label')->paginate(10)
+            ]);
     })->name('servers.index');
 
     Route::get('servers/create', function () {
@@ -25,18 +29,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Validate the request
         $validated = request()->validate([
             'label' => 'required|string|max:255',
-            'ip' => 'required|ip',
+            'ip' => [
+                'nullable',
+                Rule::requiredIf(!request()->boolean('external')),
+                'ip',
+                Rule::unique('servers')
+            ],
+            'external' => 'boolean',
         ]);
 
         // Create the server
         $server = Server::create([
             'label' => $validated['label'],
-            'ip' => $validated['ip']
+            'ip' => $validated['ip'],
+            'external' => $validated['external'] ?? false
         ]);
 
         // Redirect to the server's page
         return redirect()->route('servers.show', $server->id);
     })->name('servers.store');
+
+    Route::delete('servers/{server}', function (Server $server) {
+        $server->delete();
+        return redirect()->route('servers.index');
+    })->name('servers.destroy');
 
     // show
     Route::get('servers/{server}', function (Server $server) {
