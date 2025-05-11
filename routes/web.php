@@ -23,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('servers/{server}', [ServerController::class, 'update'])->name('servers.update.label');
     Route::get('servers/{server}', [ServerController::class, 'show'])->name('servers.show');
     Route::get('servers/{server}/applications', [ApplicationController::class, 'index'])->name('applications.index');
+
+
 });
 
 require __DIR__.'/settings.php';
