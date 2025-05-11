@@ -38,6 +38,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('servers.show', $server->id);
     })->name('servers.store');
 
+    // show
+    Route::get('servers/{server}', function (Server $server) {
+        return Inertia::render('servers/Show', [
+            'server' => $server
+        ]);
+    })->name('servers.show');
+
     Route::get('applications', function () {
         return Inertia::render('applications/Index');
     })->name('applications.index');
