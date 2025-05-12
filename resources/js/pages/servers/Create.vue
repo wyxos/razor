@@ -53,7 +53,7 @@ const submit = () => {
 
                 <div class="grid gap-2">
                     <Label for="ip">IP Address</Label>
-                    <Input id="ip" type="text" v-model="form.ip" class="mt-1 block w-full" :disabled="form.external" required />
+                    <Input id="ip" type="text" v-model="form.ip" class="mt-1 block w-full" :disabled="!form.external" required />
                     <InputError :message="form.errors.ip" />
                 </div>
 
