@@ -6,6 +6,7 @@ use App\Models\Server;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Symfony\Component\Process\Process;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -24,7 +25,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('servers/{server}', [ServerController::class, 'show'])->name('servers.show');
     Route::get('servers/{server}/applications', [ApplicationController::class, 'index'])->name('applications.index');
 
+    Route::get('app/update', function () {
+        // Disable all known output buffering
+        while (ob_get_level() > 0) ob_end_clean();
 
+        header('Content-Type: text/plain');
+        header('X-Accel-Buffering: no');
+        header('Cache-Control: no-cache');
+        header('Transfer-Encoding: chunked'); // allow streaming
+
+        $process = Process::fromShellCommandline('php artisan app:update', base_path());
+        $process->setTimeout(null);
+
+        $process->run(function ($type, $buffer) {
+            echo $buffer;
+            echo str_repeat(' ', 1024); // Force chunk flush
+            flush();
+        });
+
+        exit;
+    });
 });
 
 require __DIR__.'/settings.php';

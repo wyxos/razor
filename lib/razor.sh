@@ -15,6 +15,12 @@ clone_razor_repo() {
 
   echo "📦 Cloning Razor..."
   git clone "$REPO_URL" "$APP_DIR" || { echo "Clone failed, aborting."; exit 1; }
+
+  # ✅ Fix ownership after clone
+  chown -R razor:razor "$APP_DIR"
+
+  # Mark the repo as safe for Git
+  sudo -u razor git config --global --add safe.directory "$APP_DIR"
 }
 
 setup_env_and_permissions() {
