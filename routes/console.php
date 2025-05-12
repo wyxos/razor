@@ -45,12 +45,14 @@ Artisan::command('app:update', function () {
     };
 
     $run('git pull', 'git pull');
-    $run('composer install --no-interaction --prefer-dist --optimize-autoloader', 'composer install');
+    $run('/usr/bin/php84 /usr/bin/composer84 install --no-interaction --prefer-dist --optimize-autoloader', 'composer install');
+
     $this->call('migrate', ['--force' => true]);
     $this->call('cache:clear');
     $this->call('config:clear');
     $this->call('view:clear');
-    $run('npm install && npm run build', 'npm install + build');
+    $run('bash -c ". /home/razor/.nvm/nvm.sh && npm install && npm run build"', 'npm install + build');
+
 
     $this->info('✅ Application updated successfully.');
 })->purpose('Update the app by pulling latest changes and reinstalling dependencies');
