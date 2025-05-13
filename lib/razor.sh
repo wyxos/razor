@@ -37,6 +37,7 @@ setup_env_and_permissions() {
 
   # Setup environment
   cp .env.example .env
+  chown razor:razor .env
 
   # SQLite database permissions
   touch database/database.sqlite
