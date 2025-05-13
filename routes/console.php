@@ -45,7 +45,7 @@ Artisan::command('app:update', function () {
     };
 
     $run('git pull', 'git pull');
-    $run('sudo -u razor /usr/bin/php84 /usr/bin/composer84 update --no-dev --no-interaction --prefer-dist --optimize-autoloader', 'composer install');
+    $run('/usr/bin/php84 /usr/bin/composer84 update --no-dev --no-interaction --prefer-dist --optimize-autoloader', 'composer install');
 
 
 

@@ -51,8 +51,8 @@ build_php_from_source() {
     --with-config-file-path=$INSTALL_DIR/etc \
     --with-config-file-scan-dir=$INSTALL_DIR/etc/conf.d \
     --enable-fpm \
-    --with-fpm-user=www-data \
-    --with-fpm-group=www-data \
+    --with-fpm-user=razor \
+    --with-fpm-group=razor \
     --enable-mbstring \
     --with-curl \
     --with-openssl \
@@ -83,11 +83,11 @@ setup_php_fpm_service() {
   mkdir -p "$INSTALL_DIR/etc/php-fpm.d"
   cat > "$INSTALL_DIR/etc/php-fpm.d/www.conf" <<EOF
 [www]
-user = www-data
-group = www-data
+user = razor
+group = razor
 listen = $FPM_SOCKET
-listen.owner = www-data
-listen.group = www-data
+listen.owner = razor
+listen.group = razor
 pm = dynamic
 pm.max_children = 5
 pm.start_servers = 2

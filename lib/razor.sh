@@ -25,29 +25,43 @@ clone_razor_repo() {
 
 setup_env_and_permissions() {
   cd "$APP_DIR"
-  chown -R www-data:www-data .
-  chmod o+rx /home/razor
-  chmod -R o+rw storage bootstrap/cache
 
+  # Make everything owned by razor
+  chown -R razor:razor .
+
+  # Ensure Laravel required dirs are writeable
+  chmod -R u+rwX storage bootstrap/cache
+
+  # Make public/ readable by nginx
+  chmod -R o+rx public
+
+  # Setup environment
   cp .env.example .env
 
+  # SQLite database permissions
   touch database/database.sqlite
-  chown www-data:www-data database/database.sqlite
+  chown razor:razor database/database.sqlite
   chmod 664 database/database.sqlite
   chmod o+rx database
 
-  php84 /usr/bin/composer84 install --no-dev --optimize-autoloader
-  php84 artisan key:generate
-  php84 artisan migrate --force
+  # Run install commands as razor
+  sudo -u razor php84 /usr/bin/composer84 install --no-dev --optimize-autoloader
+  sudo -u razor php84 artisan key:generate
+  sudo -u razor php84 artisan migrate --force
 }
 
 install_node_and_build_assets() {
   export NVM_DIR="$NVM_DIR"
   mkdir -p "$NVM_DIR"
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-  nvm install --lts
+  chown -R razor:razor "$NVM_DIR"
 
-  npm ci || npm install
-  npm run build
+  sudo -u razor bash -c "
+    export NVM_DIR='$NVM_DIR'
+    [ -s '\$NVM_DIR/nvm.sh' ] || curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    [ -s '\$NVM_DIR/nvm.sh' ] && . '\$NVM_DIR/nvm.sh'
+    nvm install --lts
+    cd '$APP_DIR'
+    npm ci || npm install
+    npm run build
+  "
 }
